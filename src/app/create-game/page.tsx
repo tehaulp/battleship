@@ -31,7 +31,7 @@ export default function CreateGame() {
 
     if (data.error) {
       alert("Erreur lors de la création de la partie.");
-    } else {
+    } else if (data.game_id) {
       router.push(`/game/${data.game_id}`);
     }
   };

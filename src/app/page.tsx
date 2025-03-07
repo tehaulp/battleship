@@ -14,6 +14,7 @@ export default function Home() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [username, setUsername] = useState("");
+  const [gameIdToJoin, setGameIdToJoin] = useState("");
   const router = useRouter();
 
   useEffect(() => {
@@ -35,12 +36,36 @@ export default function Home() {
     router.push(`/create-game?username=${username}`);
   };
 
-  const handleJoinGame = () => {
+  const handleJoinGame = async (gameId: string) => {
     if (!username) {
       alert("Veuillez entrer un nom d'utilisateur avant de rejoindre une partie.");
       return;
     }
-    router.push(`/join-game?username=${username}`);
+
+    // Rejoindre la partie en utilisant l'ID de la partie
+    const response = await fetch("/api/join-game", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ game_id: gameId, player_username: username }),
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      alert("Erreur lors de la tentative de rejoindre la partie.");
+    } else {
+      router.push(`/game/${data.game_id}`);
+    }
+  };
+
+  const handleJoinById = () => {
+    if (!gameIdToJoin) {
+      alert("Veuillez entrer un ID de partie.");
+      return;
+    }
+    handleJoinGame(gameIdToJoin);
   };
 
   return (
@@ -65,11 +90,22 @@ export default function Home() {
         >
           Créer une partie
         </button>
+      </div>
+
+      {/* Champ pour entrer un ID de partie pour rejoindre */}
+      <div className="mt-6">
+        <input
+          type="text"
+          placeholder="ID de la partie"
+          value={gameIdToJoin}
+          onChange={(e) => setGameIdToJoin(e.target.value)}
+          className="p-2 border rounded"
+        />
         <button
-          onClick={handleJoinGame}
-          className="px-4 py-2 bg-green-500 text-white rounded-md"
+          onClick={handleJoinById}
+          className="ml-4 px-4 py-2 bg-green-500 text-white rounded-md"
         >
-          Rejoindre une partie
+          Rejoindre avec ID
         </button>
       </div>
 
@@ -80,8 +116,14 @@ export default function Home() {
       ) : games.length > 0 ? (
         <ul className="mt-2">
           {games.map((game) => (
-            <li key={game.game_id} className="mt-2">
+            <li key={game.game_id} className="mt-2 flex justify-between items-center">
               <span className="font-bold">{game.game_name}</span> (Hôte : {game.host_username} - Status: {game.game_status} )
+              <button
+                onClick={() => handleJoinGame(game.game_id)}
+                className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md"
+              >
+                Rejoindre
+              </button>
             </li>
           ))}
         </ul>
