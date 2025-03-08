@@ -4,9 +4,6 @@ import { NextResponse } from "next/server";
 export async function GET() {
   const { data, error } = await supabase.rpc("get_games");
 
-  console.log("Données récupérées :", data);
-  console.log("Erreur :", error);
-
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }

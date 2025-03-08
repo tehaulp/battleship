@@ -1,135 +1,35 @@
-"use client";
-
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-
-type Game = {
-  game_id: string;
-  game_name: string;
-  host_username: string;
-  game_status: string;
-};
+import Head from "next/head";
+import Link from "next/link";
 
 export default function Home() {
-  const [games, setGames] = useState<Game[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
-  const [gameIdToJoin, setGameIdToJoin] = useState("");
-  const router = useRouter();
-
-  useEffect(() => {
-    async function fetchGames() {
-      const res = await fetch("/api/games");
-      const data = await res.json();
-      setGames(data);
-      setLoading(false);
-    }
-
-    fetchGames();
-  }, []);
-
-  const handleCreateGame = () => {
-    if (!username) {
-      alert("Veuillez entrer un nom d'utilisateur avant de créer une partie.");
-      return;
-    }
-    router.push(`/create-game?username=${username}`);
-  };
-
-  const handleJoinGame = async (gameId: string) => {
-    if (!username) {
-      alert("Veuillez entrer un nom d'utilisateur avant de rejoindre une partie.");
-      return;
-    }
-
-    // Rejoindre la partie en utilisant l'ID de la partie
-    const response = await fetch("/api/join-game", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ game_id: gameId, player_username: username }),
-    });
-
-    const data = await response.json();
-
-    if (data.error) {
-      alert("Erreur lors de la tentative de rejoindre la partie.");
-    } else {
-      router.push(`/game/${data.game_id}`);
-    }
-  };
-
-  const handleJoinById = () => {
-    if (!gameIdToJoin) {
-      alert("Veuillez entrer un ID de partie.");
-      return;
-    }
-    handleJoinGame(gameIdToJoin);
-  };
-
   return (
-    <main className="p-8">
-      <h1 className="text-2xl font-bold">Bataille Navale</h1>
-      <h2 className="mt-4 text-xl">Choisissez une action :</h2>
-
-      <div className="mt-6">
-        <input
-          type="text"
-          placeholder="Nom d'utilisateur"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className="p-2 border rounded"
+    <>
+      <Head>
+        <title>Bataille Navale - Jeu Multijoueur</title>
+        <meta
+          name="description"
+          content="Jouez à la Bataille Navale en ligne avec vos amis. Créez une partie ou rejoignez-en une existante."
         />
-      </div>
+      </Head>
 
-      <div className="mt-6">
-        <button
-          onClick={handleCreateGame}
-          className="px-4 py-2 bg-blue-500 text-white rounded-md mr-4"
-        >
-          Créer une partie
-        </button>
-      </div>
+      <main className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-8">
+        <h1 className="text-4xl font-bold mb-6">Bataille Navale</h1>
 
-      {/* Champ pour entrer un ID de partie pour rejoindre */}
-      <div className="mt-6">
-        <input
-          type="text"
-          placeholder="ID de la partie"
-          value={gameIdToJoin}
-          onChange={(e) => setGameIdToJoin(e.target.value)}
-          className="p-2 border rounded"
-        />
-        <button
-          onClick={handleJoinById}
-          className="ml-4 px-4 py-2 bg-green-500 text-white rounded-md"
-        >
-          Rejoindre avec ID
-        </button>
-      </div>
-
-      <h2 className="mt-8 text-xl">Jeux en cours :</h2>
-
-      {loading ? (
-        <p>Chargement...</p>
-      ) : games.length > 0 ? (
-        <ul className="mt-2">
-          {games.map((game) => (
-            <li key={game.game_id} className="mt-2 flex justify-between items-center">
-              <span className="font-bold">{game.game_name}</span> (Hôte : {game.host_username} - Status: {game.game_status} )
-              <button
-                onClick={() => handleJoinGame(game.game_id)}
-                className="ml-4 px-4 py-2 bg-blue-500 text-white rounded-md"
-              >
-                Rejoindre
-              </button>
-            </li>
-          ))}
-        </ul>
-      ) : (
-        <p>Aucun jeu en cours.</p>
-      )}
-    </main>
+        <div className="space-y-4">
+          <Link
+            href="/create"
+            className="block bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg transition"
+          >
+            Créer une game
+          </Link>
+          <Link
+            href="/join"
+            className="block bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg transition"
+          >
+            Rejoindre une game
+          </Link>
+        </div>
+      </main>
+    </>
   );
 }
