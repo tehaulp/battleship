@@ -1,81 +1,103 @@
 "use client";
 
 import React, { useState } from "react";
-import Grid from "./Grid"; // Importation du composant Grid
+import Grid from "./Grid";
 
 export default function BoatsPlacementGrid({ gameId, playerId }) {
-  const [board, setBoard] = useState([]); // Liste des positions des bateaux
-  const [isConfirmed, setIsConfirmed] = useState(false); // Si le placement est confirmé
+  const [board, setBoard] = useState([]);
+  const [isReady, setIsReady] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [cooldown, setCooldown] = useState(false);
 
   const handleCellClick = (cellId) => {
-    if (board.includes(cellId)) {
-      // Si le bateau est déjà placé, retirer la cellule de la liste
-      setBoard(board.filter((cell) => cell !== cellId));
-    } else {
-      // Si moins de 10 bateaux, ajouter la cellule
-      if (board.length < 10) {
-        setBoard([...board, cellId]);
-      }
+    setBoard((prevBoard) =>
+      prevBoard.includes(cellId)
+        ? prevBoard.filter((cell) => cell !== cellId)
+        : prevBoard.length < 10
+        ? [...prevBoard, cellId]
+        : prevBoard
+    );
+  };
+
+  const placeBoats = async () => {
+    try {
+      const res = await fetch("/api/boats/place", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          game_id: gameId,
+          player_id: playerId,
+          boats: board,
+        }),
+      });
+      const data = await res.json();
+      if (data.code !== "200") throw new Error(data.message);
+    } catch (error) {
+      setErrorMessage("Impossible de placer les bateaux : " + error.message);
+      setIsReady(false);
+    }
+  };
+
+  const clearBoats = async () => {
+    try {
+      const res = await fetch("/api/boats/clear", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ game_id: gameId, player_id: playerId }),
+      });
+      const data = await res.json();
+      if (data.code !== "200") throw new Error(data.message);
+    } catch (error) {
+      setErrorMessage("Impossible de retirer les bateaux : " + error.message);
+      setIsReady(true);
     }
   };
 
   const handleConfirm = async () => {
-    // Confirmer si 10 bateaux sont placés
-    if (board.length === 10) {
-      setIsConfirmed(true);
-      alert("Bateaux placés, vous pouvez enregistrer les positions.");
+    if (board.length !== 10 || cooldown) return;
 
-      try {
-        const res = await fetch("/api/boats/place", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            game_id: gameId,
-            player_id: playerId,
-            boats: board,
-          }),
-        });
-        const data = await res.json();
-        console.log(data);
+    setLoading(true);
+    setErrorMessage("");
+    setCooldown(true);
 
-        if (data.code !== "200") {
-          console.error("Impossible de placer les bateaux :", data.message);
-        }
-      } catch (error) {
-        console.error("Erreur lors des placements des bateaux :", error);
-      }
+    if (isReady) {
+      await clearBoats();
     } else {
-      alert("Il vous faut placer exactement 10 bateaux.");
+      await placeBoats();
     }
+
+    setIsReady(!isReady);
+    setLoading(false);
+
+    setTimeout(() => setCooldown(false), 2000);
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-8">
-      {/* Grille de placement */}
       <Grid board={board} handleCellClick={handleCellClick} />
 
-      {/* Info sur le placement */}
-      <div className="mt-6">
+      <div className="mt-6 text-center">
         <p className="text-lg">
           Vous avez {board.length} bateaux placés. Il vous faut en placer 10.
         </p>
+
+        {errorMessage && <p className="text-red-500 mt-2">{errorMessage}</p>}
+
         <button
-          className="mt-4 bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg"
+          className={`mt-4 py-2 px-4 rounded-lg font-semibold transition ${
+            loading || board.length !== 10 || cooldown
+              ? "bg-gray-500 cursor-not-allowed"
+              : isReady
+              ? "bg-red-500 hover:bg-red-600"
+              : "bg-blue-500 hover:bg-blue-600"
+          }`}
           onClick={handleConfirm}
-          disabled={board.length !== 10}
+          disabled={loading || board.length !== 10 || cooldown}
         >
-          Confirmer le placement
+          {loading ? "Chargement..." : isReady ? "Annuler" : "Confirmer"}
         </button>
       </div>
-
-      {/* Confirmation */}
-      {isConfirmed && (
-        <div className="mt-6 bg-green-500 p-4 rounded-lg text-center">
-          <p className="text-xl text-white">Placement confirmé !</p>
-        </div>
-      )}
     </div>
   );
 }

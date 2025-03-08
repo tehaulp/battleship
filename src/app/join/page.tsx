@@ -57,6 +57,7 @@ export default function JoinGame() {
 
   useEffect(() => {
     fetchGames();
+    setInterval(fetchGames, 5000);
   }, []);
 
   return (
