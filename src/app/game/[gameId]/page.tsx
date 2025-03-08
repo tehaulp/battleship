@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import BoatsPlacementGrid from "@/components/BoatsPlacementGrid";
 
 export default function GamePage() {
   const params = useParams();
@@ -64,6 +65,7 @@ export default function GamePage() {
           <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md text-center">
             <h1 className="text-2xl font-bold mb-4">Placement des bateaux</h1>
             <p className="text-lg">Placez vos bateaux sur la grille</p>
+            <BoatsPlacementGrid gameId={gameId} playerId={playerId}></BoatsPlacementGrid>
           </div>
         )}
 
