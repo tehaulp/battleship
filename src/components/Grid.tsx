@@ -1,7 +1,5 @@
 "use client";
 
-import React from "react";
-
 export default function Grid({ board, handleCellClick }) {
   const gridSize = 10;
   const columns = "ABCDEFGHIJ".split(""); // Colonnes A à J
@@ -10,7 +8,7 @@ export default function Grid({ board, handleCellClick }) {
     const grid = [];
 
     for (let row = 1; row <= gridSize; row++) {
-      for (let col of columns) {
+      for (const col of columns) {
         const cellId = `${col}${row}`;
         const isPlaced = board.includes(cellId);
 

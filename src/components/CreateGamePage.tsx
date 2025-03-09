@@ -1,17 +1,19 @@
 "use client";
 
 import Head from "next/head";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
-export default function CreateGame() {
+interface JoinGamePageProps {
+  changePage: CallableFunction;
+}
+
+export default function CreateGamePage({ changePage }: JoinGamePageProps) {
   const [gameName, setGameName] = useState("");
   const [playerUsername, setPlayerUsername] = useState("");
   const router = useRouter();
 
   const createGame = async (gameName: string, playerUsername: string) => {
-    // Validation des champs obligatoires
     if (!gameName || !playerUsername) {
       alert("Le pseudo et le nom de la partie sont obligatoires.");
       return;
@@ -90,12 +92,12 @@ export default function CreateGame() {
               Créer
             </button>
 
-            <Link
-              href="/"
-              className="w-full text-center bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-lg transition shadow-md"
+            <button
+              onClick={() => changePage("home")}
+              className="mt-6 w-full max-w-md text-center bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 rounded-lg transition shadow-md"
             >
               Retour à l&apos;accueil
-            </Link>
+            </button>
           </div>
         </div>
       </main>
