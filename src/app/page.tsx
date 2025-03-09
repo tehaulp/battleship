@@ -1,16 +1,16 @@
 "use client";
-import Page from "@/components/Page";
+
+import Section from "@/components/sections/Section";
 import { useState } from "react";
 
 export default function Home() {
-  const [page, setPage] = useState("home");
+  const [section, setSection] = useState("home");
 
   return (
-    <main className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-8">
-      <h1 className="text-4xl font-bold mb-6">Battleship</h1>
+    <main className="w-full h-full flex flex-col">
+      <h1 className="text-4xl font-bold">Battleship</h1>
 
-      <Page page={page} changePage={setPage}></Page>
-      
+      <Section section={section} changeSection={setSection}></Section>
     </main>
   );
 }

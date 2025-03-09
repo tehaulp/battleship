@@ -1,8 +1,14 @@
 "use client";
 
-export default function Grid({ board, handleCellClick }) {
+interface GridProps {
+  board: string[];
+  hits: string[];
+  handleCellClick: CallableFunction;
+}
+
+export default function Grid({ board, hits, handleCellClick}: GridProps) {
   const gridSize = 10;
-  const columns = "ABCDEFGHIJ".split(""); // Colonnes A à J
+  const columns = "ABCDEFGHIJ".split("");
 
   const renderGrid = () => {
     const grid = [];
@@ -11,13 +17,12 @@ export default function Grid({ board, handleCellClick }) {
       for (const col of columns) {
         const cellId = `${col}${row}`;
         const isPlaced = board.includes(cellId);
+        const isHit = hits.includes(cellId);
 
         grid.push(
           <div
             key={cellId}
-            className={`w-10 h-10 border text-center flex items-center justify-center ${
-              isPlaced ? "bg-blue-500" : "bg-gray-700"
-            }`}
+            className={isPlaced ? (isHit ? "bg-blue-500" : "bg-red-700") : "bg-gray-700"}
             data-cell-id={cellId}
             onClick={() => handleCellClick(cellId)}
           >
