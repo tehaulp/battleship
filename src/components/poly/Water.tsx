@@ -2,6 +2,8 @@
 
 import * as THREE from "three";
 import { useEffect, useRef } from "react";
+import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 export default function Water() {
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -10,8 +12,10 @@ export default function Water() {
     let scene: THREE.Scene;
     let camera: THREE.PerspectiveCamera;
     let renderer: THREE.WebGLRenderer;
+    let controls: OrbitControls;
     let ocean: Ocean;
     let resizeObserver: ResizeObserver;
+    let floatingObjects: THREE.Object3D[] = [];
 
     function createScene() {
       scene = new THREE.Scene();
@@ -29,10 +33,18 @@ export default function Water() {
         canvasRef.current.innerHTML = "";
         canvasRef.current.appendChild(renderer.domElement);
       }
+
+      controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true; // Adoucit les mouvements
+      controls.dampingFactor = 0.05;
+      controls.minDistance = 50;
+      controls.maxDistance = 1000;
+      controls.maxPolarAngle = Math.PI / 2; // Empêche de passer sous l'eau
     }
 
     function getCanvasSize() {
-      if (!canvasRef.current) return { width: window.innerWidth, height: window.innerHeight };
+      if (!canvasRef.current)
+        return { width: window.innerWidth, height: window.innerHeight };
       return {
         width: canvasRef.current.clientWidth,
         height: canvasRef.current.clientHeight,
@@ -52,7 +64,11 @@ export default function Water() {
     }
 
     function createLights() {
-      const hemisphereLight = new THREE.HemisphereLight(0xaaaaaa, 0x000000, 0.9);
+      const hemisphereLight = new THREE.HemisphereLight(
+        0xaaaaaa,
+        0x000000,
+        0.9
+      );
       const shadowLight = new THREE.DirectionalLight(0xffffff, 0.9);
       shadowLight.position.set(-150, 350, 350);
       shadowLight.castShadow = true;
@@ -99,7 +115,7 @@ export default function Water() {
         }
 
         const mat = new THREE.MeshPhongMaterial({
-          color: 0x689BC3,
+          color: 0x689bc3,
           transparent: true,
           flatShading: true,
         });
@@ -113,7 +129,12 @@ export default function Water() {
         for (let i = 0; i < this.waves.length; i++) {
           const vprops = this.waves[i];
 
-          position.setXYZ(i, vprops.x + Math.cos(vprops.ang), vprops.y + Math.sin(vprops.ang) * 2, vprops.z);
+          position.setXYZ(
+            i,
+            vprops.x + Math.cos(vprops.ang),
+            vprops.y + Math.sin(vprops.ang) * 2,
+            vprops.z
+          );
           vprops.ang += vprops.speed;
         }
         position.needsUpdate = true;
@@ -126,9 +147,60 @@ export default function Water() {
       scene.add(ocean.mesh);
     }
 
+    function createFloatingObject(x: number) {
+      const loader = new GLTFLoader();
+      loader.load("/assets/models/marine-boat.glb", (glb) => {
+        const boat = glb.scene;
+        boat.scale.set(4, 4, 4);
+        boat.position.set(0, 100, x * 40);
+        boat.rotation.y = Math.PI/180 * (Math.random() * 40 + 70);
+        boat.traverse((child) => {
+          if (child instanceof THREE.Mesh) {
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+
+        floatingObjects.push(boat);
+        scene.add(boat);
+      });
+    }
+
+    function updateFloatingObjects() {
+      floatingObjects.forEach((floatingObject, index) => {
+        if (!floatingObject) return;
+
+        const position = ocean.mesh.geometry.attributes.position;
+        let minDistance = Infinity;
+        let waveHeight = 0;
+
+        for (let i = 0; i < position.count; i++) {
+          const x = position.getX(i);
+          const z = position.getZ(i);
+          const distance = Math.sqrt(
+            (floatingObject.position.x - x) ** 2 +
+              (floatingObject.position.z - z) ** 2
+          );
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            waveHeight = position.getY(i);
+          }
+        }
+
+        const time = performance.now() * 0.001;
+        floatingObject.rotation.x = Math.sin(time + index) * 0.05;
+        floatingObject.rotation.z = Math.cos(time + index) * 0.05;
+        floatingObject.position.y +=
+          (waveHeight - floatingObject.position.y) * 0.1;
+      });
+    }
+
     function loop() {
       requestAnimationFrame(loop);
       ocean.moveWaves();
+      updateFloatingObjects();
+      controls.update();
       renderer.render(scene, camera);
     }
 
@@ -136,6 +208,10 @@ export default function Water() {
       createScene();
       createLights();
       createOcean();
+      floatingObjects = [];
+      for (let i = 0; i < 3; i++) {
+        createFloatingObject(i);
+      }
       loop();
 
       resizeObserver = new ResizeObserver(() => updateRendererSize());
