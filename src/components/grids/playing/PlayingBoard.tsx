@@ -36,11 +36,13 @@ export default function PlayingBoard({
       const data = await res.json();
       if (data.code !== "200") throw new Error(data.message);
 
+      setEnemyBoard([...enemyBoard, position]);
+
       if (data.hit) {
         alert("touché !");
         setHits([...hits, position]);
       } else {
-        alert('raté !');
+        alert("raté !");
       }
     } catch (error) {
       console.log("Erreur lors de la connexion à la base de données: " + error);
@@ -56,19 +58,22 @@ export default function PlayingBoard({
     }
 
     if (enemyBoard.includes(cellId)) {
-      alert('Vous avez déjà tiré ici');
+      alert("Vous avez déjà tiré ici");
       return;
     }
 
     shoot(cellId);
-    setEnemyBoard([...enemyBoard, cellId]);
   };
 
   return (
     <div>
-      <Grid board={board} handleCellClick={handleCellClick} hits={[]}/>
+      <Grid board={board} handleCellClick={handleCellClick} hits={[]} />
       <br />
-      <Grid board={enemyBoard} handleCellClick={handleEnemyCellClick} hits={hits}></Grid>
+      <Grid
+        board={enemyBoard}
+        handleCellClick={handleEnemyCellClick}
+        hits={hits}
+      ></Grid>
     </div>
   );
 }

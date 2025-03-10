@@ -1,5 +1,13 @@
 import type { Metadata } from "next";
+import Water from "@/components/poly/Water";
 import "./globals.css";
+import { Quantico } from "next/font/google";
+
+const quantico = Quantico({
+  subsets: ["latin"],
+  variable: "--font-poppins",
+  weight: ["400", "700"],
+});
 
 export const metadata: Metadata = {
   title: "Battleship",
@@ -13,7 +21,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="w-screen h-screen">{children}</body>
+      <body className={`w-screen h-screen ${quantico.className}`}>
+        <Water></Water>
+        {children}
+      </body>
     </html>
   );
 }
