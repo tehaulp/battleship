@@ -14,6 +14,7 @@ export default function Water() {
     let renderer: THREE.WebGLRenderer;
     let controls: OrbitControls;
     let ocean: Ocean;
+    let grid: THREE.LineSegments;
     let resizeObserver: ResizeObserver;
     let floatingObjects: THREE.Object3D[] = [];
 
@@ -35,11 +36,11 @@ export default function Water() {
       }
 
       controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true; // Adoucit les mouvements
+      controls.enableDamping = true;
       controls.dampingFactor = 0.05;
       controls.minDistance = 50;
       controls.maxDistance = 1000;
-      controls.maxPolarAngle = Math.PI / 2; // Empêche de passer sous l'eau
+      controls.maxPolarAngle = Math.PI / 2;
     }
 
     function getCanvasSize() {
@@ -147,13 +148,56 @@ export default function Water() {
       scene.add(ocean.mesh);
     }
 
+    function createGrid() {
+      const gridSize = 20; // Taille des cases
+      const gridWidth = 10; // Nombre de cases sur l'axe X
+      const gridHeight = 10; // Nombre de cases sur l'axe Z
+
+      // Créer un BufferGeometry pour la grille
+      const geometry = new THREE.BufferGeometry();
+      const positions: number[] = [];
+
+      // Création des lignes horizontales
+      for (let i = 0; i <= gridHeight; i++) {
+        const z = i * gridSize - (gridHeight * gridSize) / 2;
+        positions.push((-gridWidth * gridSize) / 2, 0, z);
+        positions.push((gridWidth * gridSize) / 2, 0, z);
+      }
+
+      // Création des lignes verticales
+      for (let i = 0; i <= gridWidth; i++) {
+        const x = i * gridSize - (gridWidth * gridSize) / 2;
+        positions.push(x, 0, (-gridHeight * gridSize) / 2);
+        positions.push(x, 0, (gridHeight * gridSize) / 2);
+      }
+
+      // Appliquer les positions au BufferGeometry
+      geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(positions, 3)
+      );
+
+      // Créer un matériau pour les lignes en pointillés
+      const material = new THREE.LineDashedMaterial({
+        color: 0xcccccc,
+        dashSize: 3,
+        gapSize: 3,
+      });
+
+      // Créer la ligne de la grille
+      grid = new THREE.LineSegments(geometry, material);
+      grid.computeLineDistances(); // Nécessaire pour les pointillés
+      grid.position.set(0, 5, 0); // Légèrement au-dessus de l'eau
+      scene.add(grid);
+    }
+
     function createFloatingObject(x: number) {
       const loader = new GLTFLoader();
       loader.load("/assets/models/marine-boat.glb", (glb) => {
         const boat = glb.scene;
-        boat.scale.set(4, 4, 4);
+        boat.scale.set(2, 2, 2);
         boat.position.set(0, 100, x * 40);
-        boat.rotation.y = Math.PI/180 * (Math.random() * 40 + 70);
+        boat.rotation.y = (Math.PI / 180) * (Math.random() * 40 + 70);
         boat.traverse((child) => {
           if (child instanceof THREE.Mesh) {
             child.castShadow = true;
@@ -208,6 +252,7 @@ export default function Water() {
       createScene();
       createLights();
       createOcean();
+      createGrid(); // Ajout de la grille
       floatingObjects = [];
       for (let i = 0; i < 3; i++) {
         createFloatingObject(i);
