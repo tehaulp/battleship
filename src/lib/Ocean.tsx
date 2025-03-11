@@ -1,4 +1,11 @@
-import * as THREE from 'three';
+import * as THREE from "three";
+
+export function createOcean(scene: THREE.Scene) {
+  const ocean = new Ocean();
+  ocean.mesh.position.set(0, 0, 0);
+  scene.add(ocean.mesh);
+  return ocean;
+}
 
 export class Ocean {
   mesh: THREE.Mesh;

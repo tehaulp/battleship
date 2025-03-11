@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Water from "@/components/poly/Water";
+import Scene from "@/components/scene/Scene";
 import "./globals.css";
 import { Quantico } from "next/font/google";
 
@@ -22,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`w-screen h-screen ${quantico.className}`}>
-        <Water></Water>
+        <Scene></Scene>
         {children}
       </body>
     </html>
