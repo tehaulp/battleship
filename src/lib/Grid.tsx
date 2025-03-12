@@ -23,9 +23,9 @@ export class Grid {
     this.enemy = enemy;
 
     if (enemy) {
-      this.position = { x: 120, y: 0};
+      this.position = { x: (gridWidth * gridSize / 2 + 20), y: 0};
     } else {
-      this.position = { x: -120, y: 0 };
+      this.position = { x: -(gridWidth * gridSize / 2 + 20), y: 0 };
     }
 
     // Créer un BufferGeometry pour la grille

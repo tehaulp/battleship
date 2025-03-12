@@ -23,7 +23,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`w-screen h-screen ${quantico.className}`}>
         <Scene></Scene>
-        {children}
+        {/* {children} */}
       </body>
     </html>
   );
