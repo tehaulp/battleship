@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState} from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import BoatsPlacementGrid from "@/components/grids/placing/BoatsPlacementGrid";
 import PlayingBoard from "@/components/grids/playing/PlayingBoard";
+import { SceneManager } from "@/lib/SceneManager";
 
 interface GameProps {
   changeSection: CallableFunction;
@@ -17,6 +18,16 @@ export default function Game({ changeSection }: GameProps) {
   const [board, setBoard] = useState<string[]>([]);
   const [enemyBoard, setEnemyBoard] = useState<string[]>([]);
   const [turn, setTurn] = useState(false);
+
+  useEffect(() => {
+    if (status == "placing") {
+      SceneManager.createGrid(false);
+    }
+
+    if (status == "playing") {
+      SceneManager.createGrid(true);
+    }
+  }, [status]);
 
   useEffect(() => {
     const storedGameId = localStorage.getItem("gameId");
@@ -128,7 +139,7 @@ export default function Game({ changeSection }: GameProps) {
             playerId={playerId}
             board={board}
             setBoard={setBoard}
-          ></BoatsPlacementGrid>
+          />
         </div>
       )}
 
@@ -144,7 +155,7 @@ export default function Game({ changeSection }: GameProps) {
             enemyBoard={enemyBoard}
             setEnemyBoard={setEnemyBoard}
             turn={turn}
-          ></PlayingBoard>
+          />
         </div>
       )}
 
@@ -153,7 +164,7 @@ export default function Game({ changeSection }: GameProps) {
         <div>
           <h2>La partie est terminée</h2>
           <p>Le gagnant est déterminé !</p>
-          <button onClick={() => {changeSection('home')}}>Retour au menu</button>
+          <button onClick={() => changeSection("home")}>Retour au menu</button>
         </div>
       )}
     </div>

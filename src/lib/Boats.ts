@@ -40,7 +40,7 @@ export function createBoat(
   const loader = new GLTFLoader();
   loader.load(model, (glb) => {
     const boat = glb.scene;
-    boat.scale.set(2, 2, 2);
+    boat.scale.set(1.5, 1.5, 1.5);
     boat.position.set(calculatedPosition.x, 100, calculatedPosition.y);
     boat.rotation.y =
       (Math.PI / 180) * (Math.random() * 40 + 70) * (grid.enemy ? -1 : 1);
@@ -95,7 +95,6 @@ export function clearBoats(
   boats.forEach((boatObject) => {
     scene.remove(boatObject.boat);
   });
-  boats = [];
 }
 
 export function clearGridBoats(
@@ -108,8 +107,6 @@ export function clearGridBoats(
       scene.remove(boatObject.boat);
     }
   });
-
-  boats = boats.filter((boatObject) => boatObject.enemy !== enemy);
 }
 
 export function clearBoat(
@@ -123,9 +120,22 @@ export function clearBoat(
       scene.remove(boatObject.boat);
     }
   });
+}
 
-  boats = boats.filter(
-    (boatObject) =>
-      boatObject.position !== position && boatObject.enemy !== enemy
-  );
+export function hitBoat(
+  position: string,
+  enemy: boolean,
+  boats: { position: string; enemy: boolean; boat: THREE.Object3D }[]
+) {
+  const boat = boats.find((boatObject) => (boatObject.position === position && boatObject.enemy === enemy));
+
+  if (boat) {
+    boat.boat.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        (child as THREE.Mesh).material = new THREE.MeshStandardMaterial({
+          color: "red",
+        });
+      }
+    });
+  }
 }

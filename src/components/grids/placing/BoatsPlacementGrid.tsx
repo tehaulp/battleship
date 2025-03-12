@@ -2,19 +2,20 @@
 
 import React, { useState } from "react";
 import Grid from "../Grid";
+import { SceneManager } from "@/lib/SceneManager";
 
 interface BoatsPlacementGridProps {
   gameId: string;
   playerId: string;
   board: string[];
-  setBoard: CallableFunction
+  setBoard: CallableFunction;
 }
 
 export default function BoatsPlacementGrid({
   gameId,
   playerId,
   board,
-  setBoard
+  setBoard,
 }: BoatsPlacementGridProps) {
   const [isReady, setIsReady] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -22,13 +23,19 @@ export default function BoatsPlacementGrid({
   const [cooldown, setCooldown] = useState(false);
 
   const handleCellClick = (cellId: string) => {
-    setBoard((prevBoard: string[]) =>
-      prevBoard.includes(cellId)
-        ? prevBoard.filter((cell: string) => cell !== cellId)
-        : prevBoard.length < 10
-        ? [...prevBoard, cellId]
-        : prevBoard
-    );
+    const isCellPlaced = board.includes(cellId);
+
+    if (isCellPlaced) {
+      // Retirer le bateau si la cellule est déjà dans le tableau
+      SceneManager.removeBoat(cellId, false);
+      setBoard((prevBoard: string[]) =>
+        prevBoard.filter((cell) => cell !== cellId)
+      );
+    } else if (board.length < 10) {
+      // Ajouter le bateau si la cellule n'est pas déjà dans le tableau et qu'il y a de la place
+      SceneManager.addBoat(cellId, false);
+      setBoard((prevBoard: string[]) => [...prevBoard, cellId]);
+    }
   };
 
   const placeBoats = async () => {
@@ -92,7 +99,7 @@ export default function BoatsPlacementGrid({
 
   return (
     <div>
-      <Grid board={board} handleCellClick={handleCellClick} hits={[]}/>
+      <Grid board={board} handleCellClick={handleCellClick} hits={[]} />
 
       <div>
         <p>

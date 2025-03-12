@@ -1,168 +1,25 @@
 "use client";
 
-import * as THREE from "three";
-import { Ocean, createOcean } from "@/lib/Ocean";
 import { useEffect, useRef } from "react";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { createLights } from "@/lib/Lights";
-import { Grid } from "@/lib/Grid";
-import {
-  clearBoat,
-  clearBoats,
-  clearGridBoats,
-  createBoat,
-  updateboats,
-} from "@/lib/Boats";
+import { SceneManager } from "@/lib/SceneManager";
 
-export default function Scene() {
+export default function SceneComponent() {
   const canvasRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let scene: THREE.Scene;
-    let camera: THREE.PerspectiveCamera;
-    let renderer: THREE.WebGLRenderer;
-    let controls: OrbitControls;
-    let ocean: Ocean;
-    let grids: { enemy: boolean; grid: Grid }[] = [];
-    let resizeObserver: ResizeObserver;
-    let boats: { position: string; enemy: boolean; boat: THREE.Object3D }[] =
-      [];
+    // Initialisation de la scène
+    SceneManager.init();
 
-    function createScene() {
-      scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
-
-      const aspectRatio = getCanvasAspectRatio();
-      camera = new THREE.PerspectiveCamera(60, aspectRatio, 1, 10000);
-      camera.position.set(0, 210, 190);
-      camera.rotation.set(Math.PI / 180, 0, 0);
-
-      renderer = new THREE.WebGLRenderer({ alpha: true });
-      updateRendererSize();
-
-      if (canvasRef.current) {
-        canvasRef.current.innerHTML = "";
-        canvasRef.current.appendChild(renderer.domElement);
-      }
-
-      controls = new OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-      controls.dampingFactor = 0.05;
-      controls.minDistance = 50;
-      controls.maxDistance = 1000;
-      controls.maxPolarAngle = Math.PI / 2;
+    // Ajouter le renderer à l'élément DOM
+    if (canvasRef.current) {
+      canvasRef.current.appendChild(SceneManager.renderer.domElement);
     }
 
-    function getCanvasSize() {
-      if (!canvasRef.current)
-        return { width: window.innerWidth, height: window.innerHeight };
-      return {
-        width: canvasRef.current.clientWidth,
-        height: canvasRef.current.clientHeight,
-      };
-    }
-
-    function getCanvasAspectRatio() {
-      const { width, height } = getCanvasSize();
-      return width / height;
-    }
-
-    function updateRendererSize() {
-      const { width, height } = getCanvasSize();
-      renderer.setSize(width, height);
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    }
-
-    function loop() {
-      requestAnimationFrame(loop);
-      ocean.moveWaves();
-      updateboats(boats, ocean);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-
-    // @export
-    function addBoat(position: string, enemy: boolean) {
-      const grid = grids.find((gridObject) => gridObject.enemy === enemy);
-
-      if (grid) {
-        createBoat(
-          position,
-          boats,
-          scene,
-          grid.grid,
-          "/assets/models/marine-boat.glb"
-        );
-      } else {
-        console.error("Aucune grille trouvée pour l'ennemi spécifié.");
-      }
-    }
-
-    // @export
-    function removeGridBoats(enemy: boolean) {
-      clearGridBoats(scene, boats, enemy);
-    }
-
-    // @export
-    function removeAllBoats() {
-      clearBoats(scene, boats);
-    }
-
-    // @export
-    function removeOneBoat(position: string, enemy: boolean) {
-      clearBoat(position, scene, boats, enemy);
-    }
-
-    // @export
-    function createGrid(enemy: boolean) {
-      const grid = new Grid(scene, 20, 10, 10, enemy);
-      grids.push({ enemy, grid });
-    }
-
-    // @export
-
-    function removeGrid(enemy: boolean) {
-      const grid = grids.find((gridObject) => gridObject.enemy === enemy);
-      if (grid) {
-        scene.remove(grid.grid.lineSegment);
-        removeGridBoats(enemy);
-        grids = grids.filter((gridObject) => gridObject.enemy !== enemy);
-      } else {
-        console.error("Aucune grille trouvée pour l'ennemi spécifié.");
-      }
-    }
-
-    function removeAllGrids() {
-      // Supprimer toutes les grilles de la scène
-      grids.forEach((gridObject) => {
-        scene.remove(gridObject.grid.lineSegment);
-      });
-
-      grids = [];
-      removeAllBoats();
-    }
-
-    function init() {
-      createScene();
-      createLights(scene);
-      ocean = createOcean(scene);
-      createGrid(false);
-      createGrid(true);
-      boats = [];
-      addBoat("A2", false);
-      addBoat("A2", true);
-      loop();
-
-      resizeObserver = new ResizeObserver(() => updateRendererSize());
-      if (canvasRef.current) resizeObserver.observe(canvasRef.current);
-    }
-
-    init();
+    // Démarrer l'animation de la scène
+    SceneManager.loop(canvasRef);
 
     return () => {
-      resizeObserver?.disconnect();
-      if (canvasRef.current) canvasRef.current.innerHTML = "";
+      SceneManager.cleanup();
     };
   }, []);
 

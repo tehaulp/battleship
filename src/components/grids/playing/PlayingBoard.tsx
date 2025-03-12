@@ -49,8 +49,6 @@ export default function PlayingBoard({
     }
   };
 
-  const handleCellClick = () => {};
-
   const handleEnemyCellClick = async (cellId: string) => {
     if (!turn) {
       alert("Ce n'est pas votre tour !");
@@ -67,8 +65,6 @@ export default function PlayingBoard({
 
   return (
     <div>
-      <Grid board={board} handleCellClick={handleCellClick} hits={[]} />
-      <br />
       <Grid
         board={enemyBoard}
         handleCellClick={handleEnemyCellClick}
