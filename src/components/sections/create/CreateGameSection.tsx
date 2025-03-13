@@ -11,6 +11,7 @@ export default function CreateGameSection({
 }: CreateGameSectionProps) {
   const [gameName, setGameName] = useState("");
   const [playerUsername, setPlayerUsername] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
 
   const createGame = async (gameName: string, playerUsername: string) => {
     if (!gameName || !playerUsername) {
@@ -27,6 +28,7 @@ export default function CreateGameSection({
         body: JSON.stringify({
           name: gameName,
           player_one_username: playerUsername,
+          isPrivate: isPrivate,
         }),
       });
       const data = await res.json();
@@ -73,6 +75,19 @@ export default function CreateGameSection({
             onChange={(e) => setGameName(e.target.value)}
             className="p-2 border"
           />
+        </div>
+
+        <div className="flex flex-row gap-x-3 text-xl justify-center items-center">
+        <label htmlFor="privacyToggle">Visibilité :</label>
+        <button
+          id="privacyToggle"
+          onClick={() => setIsPrivate(!isPrivate)}
+          className={`p-2 border ${
+            isPrivate ? "bg-gray-700 text-white" : "bg-gray-300 text-black"
+          }`}
+        >
+          {isPrivate ? "Privé" : "Public"}
+        </button>
         </div>
 
         {/* Buttons */}
