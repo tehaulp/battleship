@@ -5,3 +5,22 @@
   --drop-shadow-lg: 0 5px 5px rgba(0, 0, 0, 0.25);
   --drop-shadow-md: 0 5px 5px rgba(0, 0, 0, 0.15);
 }
+
+@layer utilities {
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    border-radius: 100vh;
+    background: none;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #4b5563;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #374151;
+  }
+}
