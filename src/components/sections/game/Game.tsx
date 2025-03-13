@@ -18,6 +18,7 @@ export default function Game({ changeSection }: GameProps) {
   const [board, setBoard] = useState<string[]>([]);
   const [enemyBoard, setEnemyBoard] = useState<string[]>([]);
   const [turn, setTurn] = useState(false);
+  const [playerUsername, setPlayerUsername] = useState<string | null>(null);
 
   useEffect(() => {
     if (status == "placing") {
@@ -32,6 +33,8 @@ export default function Game({ changeSection }: GameProps) {
   useEffect(() => {
     const storedGameId = localStorage.getItem("gameId");
     const storedPlayerId = localStorage.getItem("playerId");
+    console.log(localStorage.getItem("playerUsername"));
+    setPlayerUsername(localStorage.getItem("playerUsername"));
 
     if (storedGameId && storedPlayerId) {
       setGameId(storedGameId);
@@ -112,6 +115,7 @@ export default function Game({ changeSection }: GameProps) {
   return (
     <div>
       <p className="absolute top-2 left-2 text-sm">{gameId}</p>
+      <p className="absolute top-12 left-2 text-sm text-xl">{playerUsername}</p>
 
       {/* Status Undefined */}
       {status === "undefined" && (

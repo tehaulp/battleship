@@ -43,6 +43,7 @@ export default function JoinGameSection({
       if (data.code === "200") {
         localStorage.setItem("gameId", data.game_id);
         localStorage.setItem("playerId", data.player_id);
+        localStorage.setItem("playerUsername", playerUsername);
         changeSection('game');
       } else {
         console.error("Impossible de rejoindre la partie :", data.message);
