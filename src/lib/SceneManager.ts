@@ -26,7 +26,8 @@ export class SceneManager {
 
   // Scene objects
   static grids: { enemy: boolean; grid: Grid }[] = [];
-  static boats: { position: string; enemy: boolean; boat: THREE.Object3D }[] = [];
+  static boats: { position: string; enemy: boolean; boat: THREE.Object3D }[] =
+    [];
 
   // Utility
   static resizeObserver: ResizeObserver;
@@ -39,19 +40,27 @@ export class SceneManager {
     SceneManager.scene.fog = new THREE.Fog(0xf7d9aa, 100, 950);
 
     const aspectRatio = SceneManager.getCanvasAspectRatio();
-    SceneManager.camera = new THREE.PerspectiveCamera(60, aspectRatio, 1, 10000);
+    SceneManager.camera = new THREE.PerspectiveCamera(
+      60,
+      aspectRatio,
+      1,
+      10000
+    );
     SceneManager.camera.position.set(0, 210, 190);
     SceneManager.camera.rotation.set(Math.PI / 180, 0, 0);
 
     SceneManager.renderer = new THREE.WebGLRenderer({ alpha: true });
     SceneManager.updateRendererSize();
 
-    SceneManager.controls = new OrbitControls(SceneManager.camera, SceneManager.renderer.domElement);
+    SceneManager.controls = new OrbitControls(
+      SceneManager.camera,
+      SceneManager.renderer.domElement
+    );
     SceneManager.controls.enableDamping = true;
     SceneManager.controls.dampingFactor = 0.05;
     SceneManager.controls.minDistance = 50;
-    SceneManager.controls.maxDistance = 1000;
-    SceneManager.controls.maxPolarAngle = Math.PI / 2;
+    SceneManager.controls.maxDistance = 380;
+    SceneManager.controls.maxPolarAngle = Math.PI / 180 * 30;
 
     SceneManager.ocean = createOcean(SceneManager.scene);
     createLights(SceneManager.scene);
@@ -95,7 +104,9 @@ export class SceneManager {
    * Removes all grids from the scene.
    */
   static removeAllGrids() {
-    SceneManager.grids.forEach(gridObject => SceneManager.scene.remove(gridObject.grid.lineSegment));
+    SceneManager.grids.forEach((gridObject) =>
+      SceneManager.scene.remove(gridObject.grid.lineSegment)
+    );
     SceneManager.grids = [];
     SceneManager.removeAllBoats();
   }
@@ -105,11 +116,15 @@ export class SceneManager {
    * @param enemy - Determines which grid to remove.
    */
   static removeGrid(enemy: boolean) {
-    const grid = SceneManager.grids.find(gridObject => gridObject.enemy === enemy);
+    const grid = SceneManager.grids.find(
+      (gridObject) => gridObject.enemy === enemy
+    );
     if (grid) {
       SceneManager.scene.remove(grid.grid.lineSegment);
       SceneManager.removeGridBoats(enemy);
-      SceneManager.grids = SceneManager.grids.filter(gridObject => gridObject.enemy !== enemy);
+      SceneManager.grids = SceneManager.grids.filter(
+        (gridObject) => gridObject.enemy !== enemy
+      );
     } else {
       console.error("No grid found for the specified enemy.");
     }
@@ -121,11 +136,21 @@ export class SceneManager {
    * @param enemy - Determines if the boat belongs to the enemy.
    */
   static addBoat(position: string, enemy: boolean) {
-    const grid = SceneManager.grids.find(gridObject => gridObject.enemy === enemy);
-    const modelPath = enemy ? "/assets/models/pirate-ship.glb" : "/assets/models/marine-boat.glb";
+    const grid = SceneManager.grids.find(
+      (gridObject) => gridObject.enemy === enemy
+    );
+    const modelPath = enemy
+      ? "/assets/models/pirate-ship.glb"
+      : "/assets/models/marine-boat.glb";
 
     if (grid) {
-      createBoat(position, SceneManager.boats, SceneManager.scene, grid.grid, modelPath);
+      createBoat(
+        position,
+        SceneManager.boats,
+        SceneManager.scene,
+        grid.grid,
+        modelPath
+      );
     } else {
       console.error("No grid found for the specified enemy.");
     }
@@ -145,7 +170,9 @@ export class SceneManager {
    */
   static removeGridBoats(enemy: boolean) {
     clearGridBoats(SceneManager.scene, SceneManager.boats, enemy);
-    SceneManager.boats = SceneManager.boats.filter(boatObject => boatObject.enemy !== enemy);
+    SceneManager.boats = SceneManager.boats.filter(
+      (boatObject) => boatObject.enemy !== enemy
+    );
   }
 
   /**
@@ -155,7 +182,10 @@ export class SceneManager {
    */
   static removeBoat(position: string, enemy: boolean) {
     clearBoat(position, SceneManager.scene, SceneManager.boats, enemy);
-    SceneManager.boats = SceneManager.boats.filter(boatObject => !(boatObject.position === position && boatObject.enemy === enemy));
+    SceneManager.boats = SceneManager.boats.filter(
+      (boatObject) =>
+        !(boatObject.position === position && boatObject.enemy === enemy)
+    );
   }
 
   /**
@@ -176,8 +206,11 @@ export class SceneManager {
     updateboats(SceneManager.boats, SceneManager.ocean);
     SceneManager.controls.update();
     SceneManager.renderer.render(SceneManager.scene, SceneManager.camera);
-    SceneManager.resizeObserver = new ResizeObserver(() => SceneManager.updateRendererSize());
-    if (canvasRef.current) SceneManager.resizeObserver.observe(canvasRef.current);
+    SceneManager.resizeObserver = new ResizeObserver(() =>
+      SceneManager.updateRendererSize()
+    );
+    if (canvasRef.current)
+      SceneManager.resizeObserver.observe(canvasRef.current);
   }
 
   /**
@@ -186,6 +219,8 @@ export class SceneManager {
   static cleanup() {
     if (SceneManager.resizeObserver) SceneManager.resizeObserver.disconnect();
     SceneManager.removeAllBoats();
-    SceneManager.grids.forEach(gridObject => SceneManager.scene.remove(gridObject.grid.lineSegment));
+    SceneManager.grids.forEach((gridObject) =>
+      SceneManager.scene.remove(gridObject.grid.lineSegment)
+    );
   }
 }

@@ -19,26 +19,43 @@ export default function Game({ changeSection }: GameProps) {
   const [enemyBoard, setEnemyBoard] = useState<string[]>([]);
   const [turn, setTurn] = useState(false);
   const [playerUsername, setPlayerUsername] = useState<string | null>(null);
+  const [enemyUsername, setEnemyUsername] = useState<string | null>(null);
 
   useEffect(() => {
     if (status == "placing") {
       SceneManager.createGrid(false);
+      fetchEnemyUsername();
     }
 
     if (status == "playing") {
       SceneManager.createGrid(true);
     }
-  }, [status]);
+
+    async function fetchEnemyUsername() {
+      console.log('lol')
+      const { data, error } = await supabase
+        .from("status")
+        .select("player_one_username, player_two_username")
+        .eq("id", gameId)
+        .single();
+
+      if (error) {
+        console.error("Erreur lors de la récupération du statut :", error);
+        setStatus("undefined");
+      } else {
+        setEnemyUsername((playerUsername === data.player_one_username) ? data.player_two_username : data.player_one_username);
+      }
+    }
+  }, [status, gameId, playerUsername]);
 
   useEffect(() => {
     const storedGameId = localStorage.getItem("gameId");
     const storedPlayerId = localStorage.getItem("playerId");
-    console.log(localStorage.getItem("playerUsername"));
-    setPlayerUsername(localStorage.getItem("playerUsername"));
 
     if (storedGameId && storedPlayerId) {
       setGameId(storedGameId);
       setPlayerId(storedPlayerId);
+      setPlayerUsername(localStorage.getItem("playerUsername"));
     }
   }, []);
 
@@ -56,7 +73,6 @@ export default function Game({ changeSection }: GameProps) {
         console.error("Erreur lors de la récupération du statut :", error);
         setStatus("undefined");
       } else {
-        console.log("Statut récupéré :", data);
         setStatus(data.status);
       }
     };
@@ -75,14 +91,14 @@ export default function Game({ changeSection }: GameProps) {
         },
         (payload) => {
           setStatus(payload.new.status);
-          checkTurn();
+          getLastInfo();
         }
       )
       .subscribe();
 
-    const checkTurn = async () => {
+    async function getLastInfo() {
       try {
-        const res = await fetch("/api/check-turn", {
+        const res = await fetch("/api/last-info", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -93,15 +109,27 @@ export default function Game({ changeSection }: GameProps) {
           }),
         });
         const data = await res.json();
-        setTurn(data);
-        return data;
+        if (data.code === "200") {
+          if (data.last_hit) {
+            setLastEnemyShot(data.last_shot);
+          }
+          setTurn(data.turn);
+          return;
+        } else {
+          console.error("Impossible de rejoindre la partie :", data.message);
+        }
       } catch (error) {
         console.error(
           "Erreur lors de la connexion à la base de données: ",
           error
         );
       }
-    };
+    }
+
+    function setLastEnemyShot(position: string) {
+      console.log("test");
+      SceneManager.setBoatHit(position, false);
+    }
 
     return () => {
       supabase.removeChannel(channel);
@@ -115,7 +143,8 @@ export default function Game({ changeSection }: GameProps) {
   return (
     <div>
       <p className="absolute top-2 left-2 text-sm">{gameId}</p>
-      <p className="absolute top-12 left-2 text-sm text-xl">{playerUsername}</p>
+      <p className="absolute top-12 left-2 text-xl">{playerUsername}</p>
+      <p className="absolute top-12 right-2 text-xl">{enemyUsername}</p>
 
       {/* Status Undefined */}
       {status === "undefined" && (
@@ -128,7 +157,9 @@ export default function Game({ changeSection }: GameProps) {
       {/* Status Waiting */}
       {status === "waiting" && (
         <div>
-          <h2 className="absolute top-5 left-1/2 transform -translate-x-1/2 text-3xl font-bold">Salle d&apos;attente</h2>
+          <h2 className="absolute top-5 left-1/2 transform -translate-x-1/2 text-3xl font-bold">
+            Salle d&apos;attente
+          </h2>
           <p className="text-2xl">En attente d&apos;un adversaire...</p>
         </div>
       )}
@@ -174,7 +205,12 @@ export default function Game({ changeSection }: GameProps) {
             <h2 className="text-3xl font-bold">La partie est terminée</h2>
             <p className="text-xl">Le gagnant est:</p>
           </div>
-          <button onClick={() => changeSection("home")} className="text-lg bg-gray-600 p-2 hover:bg-red-500">Retour au menu</button>
+          <button
+            onClick={() => changeSection("home")}
+            className="text-lg bg-gray-600 p-2 hover:bg-red-500"
+          >
+            Retour au menu
+          </button>
         </>
       )}
     </div>

@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   const { game_id, player_id} = await request.json();
 
-  const { data, error } = await supabase.rpc("check_player_turn", {
+  const { data, error } = await supabase.rpc("get_last_game_info", {
     game_id_input: game_id,
     player_id_input: player_id
   });

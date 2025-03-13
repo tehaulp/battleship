@@ -24,3 +24,11 @@
     background: #374151;
   }
 }
+
+main {
+  pointer-events: none;
+}
+
+main * {
+  pointer-events: all;
+}

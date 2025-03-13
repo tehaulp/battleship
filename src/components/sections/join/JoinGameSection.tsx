@@ -89,7 +89,7 @@ export default function JoinGameSection({
       <div className="flex flex-col gap-y-6 items-center">
         {/* Player Username */}
         <div className="flex flex-row gap-x-3 text-xl justify-center items-center">
-          <label htmlFor="playerUsername">Votre pseudo</label>
+          <label htmlFor="playerUsername">Pseudo:</label>
           <input
             id="playerUsername"
             type="text"
