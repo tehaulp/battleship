@@ -43,7 +43,7 @@ export default function Grid({ board, hits, handleCellClick, turn }: GridProps) 
             return (
               <div
                 key={cellId}
-                className={`${isPlaced ? (isHit ? "bg-blue-500" : "bg-[#ffffff80]") : ""} w-5 h-5 border`}
+                className={`${isPlaced ? (isHit ? "bg-blue-500 cursor-not-allowed" : "bg-[#ffffff80] cursor-not-allowed") : ""} w-5 h-5 border`}
                 data-cell-id={cellId}
                 onClick={() => handleCellClick(cellId)}
               ></div>
