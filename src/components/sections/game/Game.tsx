@@ -20,6 +20,7 @@ export default function Game({ changeSection }: GameProps) {
   const [turn, setTurn] = useState(false);
   const [playerUsername, setPlayerUsername] = useState<string | null>(null);
   const [enemyUsername, setEnemyUsername] = useState<string | null>(null);
+  const [winnerUsername, setWinnerUsername] = useState<string | null>(null);
 
   useEffect(() => {
     if (status == "placing") {
@@ -113,6 +114,10 @@ export default function Game({ changeSection }: GameProps) {
           if (data.last_hit) {
             setLastEnemyShot(data.last_shot);
           }
+
+          if (data.winner_username) {
+            setWinnerUsername(data.winner_username);
+          }
           setTurn(data.turn);
           return;
         } else {
@@ -204,6 +209,7 @@ export default function Game({ changeSection }: GameProps) {
           <div className="absolute top-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-y-3">
             <h2 className="text-3xl font-bold">La partie est terminée</h2>
             <p className="text-xl">Le gagnant est:</p>
+            <p className="text-2xl font-bold">{winnerUsername}</p>
           </div>
           <button
             onClick={() => changeSection("home")}
