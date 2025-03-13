@@ -45,37 +45,43 @@ export default function CreateGameSection({
 
   return (
     <section>
-      <h1>Créer une Partie</h1>
+      <h1 className="absolute top-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-y-3 text-3xl font-bold">Créer une Partie</h1>
 
-      <div>
+      <div className="flex flex-col gap-y-6 items-center">
         {/* Player Username */}
-        <label htmlFor="playerUsername">Votre pseudo</label>
-        <input
-          id="playerUsername"
-          type="text"
-          placeholder="Entrez votre pseudo..."
-          value={playerUsername}
-          onChange={(e) => setPlayerUsername(e.target.value)}
-        />
+        <div className="flex flex-row gap-x-3 text-xl justify-center items-center">
+          <label htmlFor="playerUsername">Pseudo:</label>
+          <input
+            id="playerUsername"
+            type="text"
+            placeholder="Entrez votre pseudo..."
+            value={playerUsername}
+            onChange={(e) => setPlayerUsername(e.target.value)}
+            className="p-2 border"
+          />
+        </div>
 
         {/* Game Name */}
-        <label htmlFor="gameName">Nom de la partie</label>
-        <input
-          id="gameName"
-          type="text"
-          placeholder="Entrez un nom..."
-          value={gameName}
-          onChange={(e) => setGameName(e.target.value)}
-        />
+        <div className="flex flex-row gap-x-3 text-xl justify-center items-center">
+          <label htmlFor="gameName">Nom de la partie:</label>
+          <input
+            id="gameName"
+            type="text"
+            placeholder="Entrez un nom..."
+            value={gameName}
+            onChange={(e) => setGameName(e.target.value)}
+            className="p-2 border"
+          />
+        </div>
 
         {/* Buttons */}
-        <div>
-          <button onClick={() => createGame(gameName, playerUsername)}>
+        <div className="flex flex-row gap-x-4 text-xl justify-center">
+          <button onClick={() => createGame(gameName, playerUsername)} className="bg-gray-600 p-2 hover:bg-blue-500">
             Créer
           </button>
 
-          <button onClick={() => changeSection("home")}>
-            Retour à l&apos;accueil
+          <button onClick={() => changeSection("home")} className="bg-gray-600 p-2 hover:bg-red-500">
+            Retour
           </button>
         </div>
       </div>

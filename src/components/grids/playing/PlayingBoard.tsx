@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Grid from "../Grid";
+import { SceneManager } from "@/lib/SceneManager";
 
 interface PlayingBoardProps {
   gameId: string;
@@ -39,10 +40,9 @@ export default function PlayingBoard({
       setEnemyBoard([...enemyBoard, position]);
 
       if (data.hit) {
-        alert("touché !");
         setHits([...hits, position]);
-      } else {
-        alert("raté !");
+        SceneManager.addBoat(position, true);
+        setTimeout(() => { SceneManager.setBoatHit(position, true); }, 200)
       }
     } catch (error) {
       console.log("Erreur lors de la connexion à la base de données: " + error);
@@ -51,12 +51,10 @@ export default function PlayingBoard({
 
   const handleEnemyCellClick = async (cellId: string) => {
     if (!turn) {
-      alert("Ce n'est pas votre tour !");
       return;
     }
 
     if (enemyBoard.includes(cellId)) {
-      alert("Vous avez déjà tiré ici");
       return;
     }
 
@@ -64,12 +62,17 @@ export default function PlayingBoard({
   };
 
   return (
-    <div>
-      <Grid
-        board={enemyBoard}
-        handleCellClick={handleEnemyCellClick}
-        hits={hits}
-      ></Grid>
-    </div>
+    <>
+      <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+        {turn ? <p className="text-yellow-600 font-semibold">Tirez !</p> : <p>Patientez...</p>}
+
+        <Grid
+          board={enemyBoard}
+          handleCellClick={handleEnemyCellClick}
+          hits={hits}
+          turn={turn}
+        ></Grid>
+      </div>
+    </>
   );
 }

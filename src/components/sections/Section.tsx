@@ -1,7 +1,9 @@
+import { useEffect } from "react";
 import CreateGameSection from "./create/CreateGameSection";
 import GameSection from "./game/GameSection";
 import HomeSection from "./home/HomeSection";
 import JoinGameSection from './join/JoinGameSection';
+import { SceneManager } from "@/lib/SceneManager";
 
 interface SectionProps {
   section: string,
@@ -9,6 +11,7 @@ interface SectionProps {
 };
 
 export default function Section({section, changeSection}: SectionProps) {
+
   switch (section) {
     case 'home':
       return <HomeSection changeSection={changeSection}></HomeSection>;

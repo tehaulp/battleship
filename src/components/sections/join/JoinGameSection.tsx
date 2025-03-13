@@ -81,40 +81,67 @@ export default function JoinGameSection({
 
   return (
     <section>
-      <h2>Rejoindre une Partie</h2>
+      <h2 className="absolute top-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-y-3 text-3xl font-bold">
+        Rejoindre une Partie
+      </h2>
 
-      <div>
-        <label htmlFor="playerUsername">Votre pseudo</label>
-        <input
-          id="playerUsername"
-          type="text"
-          placeholder="Entrez votre pseudo..."
-          value={playerUsername}
-          onChange={(e) => setPlayerUsername(e.target.value)}
-        />
+      <div className="flex flex-col gap-y-6 items-center">
+        {/* Player Username */}
+        <div className="flex flex-row gap-x-3 text-xl justify-center items-center">
+          <label htmlFor="playerUsername">Votre pseudo</label>
+          <input
+            id="playerUsername"
+            type="text"
+            placeholder="Entrez votre pseudo..."
+            value={playerUsername}
+            onChange={(e) => setPlayerUsername(e.target.value)}
+            className="p-2 border"
+          />
+        </div>
 
-        <label htmlFor="gameId">Entrer l&apos;ID d&apos;une game</label>
-        <input
-          id="gameId"
-          type="text"
-          placeholder="Ex: xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"
-          value={gameId}
-          onChange={(e) => setGameId(e.target.value)}
-        />
-        <button onClick={() => joinGame(gameId, playerUsername)}>
-          Rejoindre via ID
-        </button>
+        {/* Game ID */}
+        <div className="flex flex-row gap-x-3 text-xl justify-center items-center">
+          <label htmlFor="gameId">ID de la partie</label>
+          <input
+            id="gameId"
+            type="text"
+            placeholder="Ex: xxxxxxxx-xxxx-Mxxx-Nxxx-xxxxxxxxxxxx"
+            value={gameId}
+            onChange={(e) => setGameId(e.target.value)}
+            className="p-2 border"
+          />
+        </div>
+
+        {/* Join Button */}
+        <div className="flex flex-row gap-x-3 text-xl justify-center items-center">
+          <button
+            onClick={() => joinGame(gameId, playerUsername)}
+            className="bg-gray-600 p-2 hover:bg-blue-500"
+          >
+            Rejoindre via ID
+          </button>
+        </div>
       </div>
 
-      <GameList
-        games={games}
-        joinGame={joinGame}
-        playerUsername={playerUsername}
-      />
+      {/* Game List */}
+      <div className="mt-6">
+        <GameList
+          games={games}
+          joinGame={joinGame}
+          playerUsername={playerUsername}
+        />
+      </div>
 
-      <button onClick={() => changeSection("home")}>
-        Retour à l&apos;accueil
-      </button>
+      {/* Back to Home Button */}
+      <div className="mt-6 flex justify-center">
+        <button
+          onClick={() => changeSection("home")}
+          className="bg-gray-600 p-2 hover:bg-red-500"
+        >
+          Retour à l&apos;accueil
+        </button>
+      </div>
     </section>
+
   );
 }

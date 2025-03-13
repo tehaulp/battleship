@@ -26,13 +26,11 @@ export default function BoatsPlacementGrid({
     const isCellPlaced = board.includes(cellId);
 
     if (isCellPlaced) {
-      // Retirer le bateau si la cellule est déjà dans le tableau
       SceneManager.removeBoat(cellId, false);
       setBoard((prevBoard: string[]) =>
         prevBoard.filter((cell) => cell !== cellId)
       );
     } else if (board.length < 10) {
-      // Ajouter le bateau si la cellule n'est pas déjà dans le tableau et qu'il y a de la place
       SceneManager.addBoat(cellId, false);
       setBoard((prevBoard: string[]) => [...prevBoard, cellId]);
     }
@@ -54,7 +52,7 @@ export default function BoatsPlacementGrid({
     } catch (error) {
       setErrorMessage(
         "Impossible de placer les bateaux : " +
-          (error instanceof Error ? error.message : "Erreur inconnue")
+        (error instanceof Error ? error.message : "Erreur inconnue")
       );
       setIsReady(false);
     }
@@ -72,7 +70,7 @@ export default function BoatsPlacementGrid({
     } catch (error) {
       setErrorMessage(
         "Impossible de retirer les bateaux : " +
-          (error instanceof Error ? error.message : "Erreur inconnue")
+        (error instanceof Error ? error.message : "Erreur inconnue")
       );
       setIsReady(true);
     }
@@ -87,6 +85,8 @@ export default function BoatsPlacementGrid({
 
     if (isReady) {
       await clearBoats();
+      setBoard([]);
+      SceneManager.removeGridBoats(false);
     } else {
       await placeBoats();
     }
@@ -98,30 +98,27 @@ export default function BoatsPlacementGrid({
   };
 
   return (
-    <div>
-      <Grid board={board} handleCellClick={handleCellClick} hits={[]} />
-
-      <div>
-        <p>
-          Vous avez {board.length} bateaux placés. Il vous faut en placer 10.
-        </p>
-
+    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-y-2">
+      <div className="flex flex-row gap-x-2 items-center">
         {errorMessage && <p>{errorMessage}</p>}
-
+        <p>
+          {board.length} / 10.
+        </p>
         <button
-          className={
-            loading || board.length !== 10 || cooldown
-              ? "bg-gray-500 cursor-not-allowed"
-              : isReady
+          className={`${loading || board.length !== 10 || cooldown
+            ? "bg-gray-500 cursor-not-allowed"
+            : isReady
               ? "bg-red-500 hover:bg-red-600"
               : "bg-blue-500 hover:bg-blue-600"
-          }
+            }
+          p-1`}
           onClick={handleConfirm}
           disabled={loading || board.length !== 10 || cooldown}
         >
           {loading ? "Chargement..." : isReady ? "Annuler" : "Confirmer"}
         </button>
       </div>
+      <Grid board={board} handleCellClick={handleCellClick} hits={[]} turn={true}/>
     </div>
   );
 }

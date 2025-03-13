@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState} from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import BoatsPlacementGrid from "@/components/grids/placing/BoatsPlacementGrid";
@@ -111,7 +111,7 @@ export default function Game({ changeSection }: GameProps) {
 
   return (
     <div>
-      <p>{gameId}</p>
+      <p className="absolute top-2 left-2 text-sm">{gameId}</p>
 
       {/* Status Undefined */}
       {status === "undefined" && (
@@ -124,30 +124,34 @@ export default function Game({ changeSection }: GameProps) {
       {/* Status Waiting */}
       {status === "waiting" && (
         <div>
-          <h2>Salle d&apos;attente</h2>
-          <p>En attente d&apos;un adversaire...</p>
+          <h2 className="absolute top-5 left-1/2 transform -translate-x-1/2 text-3xl font-bold">Salle d&apos;attente</h2>
+          <p className="text-2xl">En attente d&apos;un adversaire...</p>
         </div>
       )}
 
       {/* Status Placing */}
       {status === "placing" && (
-        <div>
-          <h2>Placement des bateaux</h2>
-          <p>Placez vos bateaux sur la grille</p>
+        <>
+          <div className="absolute top-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-y-3">
+            <h2 className="text-2xl font-bold">Placement des bateaux</h2>
+            <p>Placez vos bateaux sur la grille</p>
+          </div>
           <BoatsPlacementGrid
             gameId={gameId}
             playerId={playerId}
             board={board}
             setBoard={setBoard}
           />
-        </div>
+        </>
       )}
 
       {/* Status Playing */}
       {status === "playing" && (
-        <div>
-          <h2>La partie est en cours !</h2>
-          <p>C&apos;est le moment de jouer !</p>
+        <>
+          <div className="absolute top-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-y-3">
+            <h2 className="text-4xl font-bold">Bataillez !</h2>
+            <p>C&apos;est le moment de jouer !</p>
+          </div>
           <PlayingBoard
             gameId={gameId}
             playerId={playerId}
@@ -156,16 +160,18 @@ export default function Game({ changeSection }: GameProps) {
             setEnemyBoard={setEnemyBoard}
             turn={turn}
           />
-        </div>
+        </>
       )}
 
       {/* Status Finished */}
       {status === "finished" && (
-        <div>
-          <h2>La partie est terminée</h2>
-          <p>Le gagnant est déterminé !</p>
-          <button onClick={() => changeSection("home")}>Retour au menu</button>
-        </div>
+        <>
+          <div className="absolute top-5 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-y-3">
+            <h2 className="text-3xl font-bold">La partie est terminée</h2>
+            <p className="text-xl">Le gagnant est:</p>
+          </div>
+          <button onClick={() => changeSection("home")} className="text-lg bg-gray-600 p-2 hover:bg-red-500">Retour au menu</button>
+        </>
       )}
     </div>
   );
