@@ -16,7 +16,6 @@ interface PlayingBoardProps {
 export default function PlayingBoard({
   gameId,
   playerId,
-  board,
   enemyBoard,
   setEnemyBoard,
   turn,
