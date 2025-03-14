@@ -6,6 +6,7 @@ import Link from "next/link";
 import BoatsPlacementGrid from "@/components/grids/placing/BoatsPlacementGrid";
 import PlayingBoard from "@/components/grids/playing/PlayingBoard";
 import { SceneManager } from "@/lib/SceneManager";
+import { StageManager } from "@/lib/StageManager";
 
 interface GameProps {
   changeSection: CallableFunction;
@@ -17,6 +18,7 @@ export default function Game({ changeSection }: GameProps) {
   const [playerId, setPlayerId] = useState<string | null>(null);
   const [board, setBoard] = useState<string[]>([]);
   const [enemyBoard, setEnemyBoard] = useState<string[]>([]);
+  const [enemyShots, setEnemyShots] = useState<string[]>([]);
   const [turn, setTurn] = useState(false);
   const [playerUsername, setPlayerUsername] = useState<string | null>(null);
   const [enemyUsername, setEnemyUsername] = useState<string | null>(null);
@@ -137,7 +139,14 @@ export default function Game({ changeSection }: GameProps) {
     }
 
     function setLastEnemyShot(position: string) {
-      SceneManager.setBoatHit(position, false);
+      setEnemyShots((prevShots) => {
+        if (!prevShots.includes(position)) {
+          SceneManager.setBoatHit(position, false);
+          StageManager.showNavy("Huumph...");
+          return [...prevShots, position];
+        }
+        return enemyShots;
+      });
     }
 
     return () => {
@@ -168,7 +177,7 @@ export default function Game({ changeSection }: GameProps) {
     } catch (err) {
       console.error("Erreur lors de la copie :", err);
     }
-  };
+  }
 
   if (!gameId) return <p>Erreur: Aucune partie trouvée</p>;
   if (!playerId)

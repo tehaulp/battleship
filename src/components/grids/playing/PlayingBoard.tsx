@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Grid from "../Grid";
 import { SceneManager } from "@/lib/SceneManager";
+import { StageManager } from "@/lib/StageManager";
 
 interface PlayingBoardProps {
   gameId: string;
@@ -41,7 +42,8 @@ export default function PlayingBoard({
       if (data.hit) {
         setHits([...hits, position]);
         SceneManager.addBoat(position, true);
-        setTimeout(() => { SceneManager.setBoatHit(position, true); }, 300)
+        StageManager.showPirate('Graaaah !');
+        setTimeout(() => { SceneManager.setBoatHit(position, true); }, 300);
       }
     } catch (error) {
       console.log("Erreur lors de la connexion à la base de données: " + error);

@@ -94,7 +94,7 @@ export default function BoatsPlacementGrid({
     setIsReady(!isReady);
     setLoading(false);
 
-    setTimeout(() => setCooldown(false), 2000);
+    setTimeout(() => setCooldown(false), 1000);
   };
 
   return (

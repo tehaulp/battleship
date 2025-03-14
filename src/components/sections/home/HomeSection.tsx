@@ -6,7 +6,7 @@ interface HomeSectionProps {
 
 export default function HomeSection({ changeSection }: HomeSectionProps) {
   return (
-    <section className="flex flex-col space-y-4 text-2xl text-white items-center">
+    <section className="flex flex-col space-y-10 text-2xl text-white items-center">
       <Image
         src="/img/icon-title.png"
         alt="tet"
