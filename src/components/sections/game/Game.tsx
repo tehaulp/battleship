@@ -21,6 +21,7 @@ export default function Game({ changeSection }: GameProps) {
   const [playerUsername, setPlayerUsername] = useState<string | null>(null);
   const [enemyUsername, setEnemyUsername] = useState<string | null>(null);
   const [winnerUsername, setWinnerUsername] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (status == "placing") {
@@ -33,7 +34,7 @@ export default function Game({ changeSection }: GameProps) {
     }
 
     async function fetchEnemyUsername() {
-      console.log('lol')
+      console.log("lol");
       const { data, error } = await supabase
         .from("status")
         .select("player_one_username, player_two_username")
@@ -44,7 +45,11 @@ export default function Game({ changeSection }: GameProps) {
         console.error("Erreur lors de la récupération du statut :", error);
         setStatus("undefined");
       } else {
-        setEnemyUsername((playerUsername === data.player_one_username) ? data.player_two_username : data.player_one_username);
+        setEnemyUsername(
+          playerUsername === data.player_one_username
+            ? data.player_two_username
+            : data.player_one_username
+        );
       }
     }
   }, [status, gameId, playerUsername]);
@@ -132,7 +137,6 @@ export default function Game({ changeSection }: GameProps) {
     }
 
     function setLastEnemyShot(position: string) {
-      console.log("test");
       SceneManager.setBoatHit(position, false);
     }
 
@@ -141,13 +145,44 @@ export default function Game({ changeSection }: GameProps) {
     };
   }, [gameId, playerId]);
 
+  async function handleCopy() {
+    console.log(
+      "handleCopy exécuté ! Côté client :",
+      typeof window !== "undefined"
+    );
+
+    if (typeof window === "undefined" || !navigator.clipboard) {
+      console.error("L'API Clipboard n'est pas disponible.");
+      return;
+    }
+
+    if (!gameId) {
+      console.error("Aucun ID de partie disponible");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(gameId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Erreur lors de la copie :", err);
+    }
+  };
+
   if (!gameId) return <p>Erreur: Aucune partie trouvée</p>;
   if (!playerId)
     return <p>Erreur : Vous ne faites pas partie de cette partie.</p>;
 
   return (
     <div>
-      <p className="absolute top-2 left-2 text-sm">{gameId}</p>
+      <p
+        className="absolute top-2 left-2 text-sm cursor-pointer"
+        onClick={handleCopy}
+      >
+        {gameId}
+        {copied && <span className="text-sm text-gray-800 ml-2">copié</span>}
+      </p>
       <p className="absolute top-12 left-2 text-xl">{playerUsername}</p>
       <p className="absolute top-12 right-2 text-xl">{enemyUsername}</p>
 

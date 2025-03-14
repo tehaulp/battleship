@@ -41,7 +41,7 @@ export default function PlayingBoard({
       if (data.hit) {
         setHits([...hits, position]);
         SceneManager.addBoat(position, true);
-        setTimeout(() => { SceneManager.setBoatHit(position, true); }, 200)
+        setTimeout(() => { SceneManager.setBoatHit(position, true); }, 300)
       }
     } catch (error) {
       console.log("Erreur lors de la connexion à la base de données: " + error);
