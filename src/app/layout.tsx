@@ -6,7 +6,7 @@ import { Quantico } from "next/font/google";
 
 const quantico = Quantico({
   subsets: ["latin"],
-  variable: "--font-poppins",
+  variable: "--font-quantico",
   weight: ["400", "700"],
 });
 
@@ -23,8 +23,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`w-screen h-screen ${quantico.className}`}>
-        <Scene></Scene>
-        <Stage></Stage>
+        <Scene/>
+        <Stage/>
         {children}
       </body>
     </html>
